@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ご予約フォーム</title>
+
+  <style>
+    :root{
+      --bg:#f2f2f2;
+      --line:#e6e6e6;
+      --text:#222;
+      --muted:#777;
+      --card:#fff;
+      --input:#fff;
+      --radius:6px;
+      --dark:#222;
+      --danger:#d60000;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;
+    }
+    .titlebar{
+      background:#efefef;
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.02em;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .sheet{
+      max-width:720px;
+      margin:0 auto;
+      background:var(--card);
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+    }
+    .row{
+      display:flex;
+      gap:12px;
+      padding:14px;
+      border-top:1px solid var(--line);
+      align-items:flex-start;
+    }
+    .row:first-child{ border-top:0; }
+    .label{
+      width:180px;
+      min-width:180px;
+      font-weight:800;
+      padding-top:10px;
+      line-height:1.2;
+    }
+    .label .req{ margin-left:4px; font-weight:900; }
+    .control{ flex:1; }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      line-height:1.4;
+    }
+    input, select, textarea{
+      width:100%;
+      border:1px solid #d6d6d6;
+      border-radius:var(--radius);
+      padding:0 12px;
+      background:var(--input);
+      font-size:16px;
+      outline:none;
+    }
+    input, select{ height:46px; }
+    textarea{
+      padding:10px 12px;
+      min-height:110px;
+      resize:vertical;
+      font-size:16px;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color:#9bbcff;
+      box-shadow:0 0 0 3px rgba(11,99,255,.12);
+    }
+
+    .subControl{ margin-top:10px; }
+
+    .chkGrid{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:6px;
+    }
+    .chk{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 12px;
+      border:1px solid #d6d6d6;
+      border-radius:12px;
+      background:#fff;
+      font-weight:800;
+      user-select:none;
+    }
+    .chk input{
+      width:20px;
+      height:20px;
+      accent-color:#111;
+    }
+
+    /* actions */
+    .actionsRow{
+      padding:18px 14px 22px;
+      border-top:1px solid var(--line);
+      background:#fff;
+      position:sticky;
+      bottom:0;
+      z-index:5;
+      padding-bottom:calc(22px + env(safe-area-inset-bottom));
+    }
+    .twoBtns{ display:flex; gap:12px; }
+    .pillConfirm{
+      flex:1;
+      height:52px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      border:2px solid #111;
+      background:#fff;
+      color:#111;
+    }
+    .pillConfirm:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    /* confirm view */
+    .confirm{ display:none; padding:14px; }
+    .confirm h2{ margin:8px 0 12px; font-size:18px; }
+    .summary{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .sumRow{
+      display:flex;
+      gap:12px;
+      padding:12px 14px;
+      border-top:1px solid var(--line);
+    }
+    .sumRow:first-child{ border-top:0; }
+    .sumKey{
+      width:200px;
+      min-width:200px;
+      color:#111;
+      font-weight:900;
+    }
+    .sumVal{ flex:1; color:#222; word-break:break-word; }
+    .confirmActions{ display:flex; gap:12px; margin-top:14px; }
+    .ghost{
+      flex:1;
+      height:52px;
+      border-radius:999px;
+      border:2px solid #666;
+      background:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      color:#111;
+    }
+    .send{
+      flex:1;
+      height:52px;
+      border-radius:999px;
+      border:0;
+      background:var(--dark);
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    @media (max-width:520px){
+      .label{ width:140px; min-width:140px; }
+      .sumKey{ width:140px; min-width:140px; }
+    }
+
+    /* スマホ最適化 */
+    html{ -webkit-text-size-adjust:100%; }
+    .sheet{ max-width:640px; width:100%; }
+    .row{
+      display:grid;
+      grid-template-columns:140px 1fr;
+      align-items:center;
+      gap:10px;
+    }
+    .label{ width:auto; min-width:0; padding-top:0; font-size:15px; }
+    @media (max-width:380px){
+      .row{ grid-template-columns:1fr; align-items:start; }
+      .label{ padding-top:0; }
+    }
+
+    /* ---- start view (おしゃれ版) ---- */
+    .startHero{
+      padding:18px 14px 6px;
+      background:linear-gradient(180deg, #ffffff, #fbfbfb);
+      border-bottom:1px solid var(--line);
+    }
+    .startBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border:1px solid #e8e8e8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      color:#111;
+      background:#fff;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+    .startTitle{
+      margin:10px 0 6px;
+      font-size:20px;
+      letter-spacing:.02em;
+    }
+    .startLead{
+      margin:0 0 8px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .startCards{
+      padding:12px 14px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .startCard{
+      width:100%;
+      border:1px solid #e5e5e5;
+      border-radius:16px;
+      background:#fff;
+      padding:14px 14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      cursor:pointer;
+      text-align:left;
+      box-shadow:0 10px 26px rgba(0,0,0,.06);
+      transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .startCard:hover{
+      border-color:#dcdcdc;
+      box-shadow:0 12px 32px rgba(0,0,0,.08);
+    }
+    .startCard:active{
+      transform:translateY(1px);
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+    .startIcon{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      border:1px solid #eee;
+      background:#fafafa;
+      font-size:20px;
+      flex:0 0 auto;
+    }
+    .startText{ flex:1; min-width:0; }
+    .startMain{
+      font-size:18px;
+      font-weight:900;
+      color:#111;
+      line-height:1.2;
+    }
+    .startSub{
+      margin-top:4px;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      line-height:1.4;
+    }
+    .startArrow{
+      font-size:26px;
+      font-weight:900;
+      color:#bbb;
+      margin-left:4px;
+      flex:0 0 auto;
+    }
+    .startNote{
+      padding:0 14px 18px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .startNoteDot{ font-size:10px; margin-top:2px; }
+
+    /* ---- view transition (ふわっと切替) ---- */
+    .viewFade{
+      animation:viewFade .18s ease-out;
+    }
+    @keyframes viewFade{
+      from{ opacity:0; transform:translateY(6px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="titlebar">ご予約フォーム</div>
+
+  <!-- 最初の二択ページ -->
+  <main class="sheet" id="startView" style="display:none;">
+    <div class="startHero">
+      <div class="startBadge">STEP 1</div>
+      <h1 class="startTitle">メニューを選択</h1>
+      <p class="startLead">ボディ／フェイシャルを選ぶと、カウンセリングシートが始まります。</p>
+    </div>
+
+    <div class="startCards">
+      <button type="button" class="startCard" id="startBody" aria-label="ボディを選択">
+        <div class="startIcon" aria-hidden="true">🫧</div>
+        <div class="startText">
+          <div class="startMain">① ボディ</div>
+          <div class="startSub">肩こり・むくみ・疲れ・ダイエットなど</div>
+        </div>
+        <div class="startArrow" aria-hidden="true">›</div>
+      </button>
+
+      <button type="button" class="startCard" id="startFacial" aria-label="フェイシャルを選択">
+        <div class="startIcon" aria-hidden="true">✨</div>
+        <div class="startText">
+          <div class="startMain">② フェイシャル</div>
+          <div class="startSub">保湿・毛穴・リフトなど</div>
+        </div>
+        <div class="startArrow" aria-hidden="true">›</div>
+      </button>
+    </div>
+
+    <div class="startNote">
+      <span class="startNoteDot">●</span>
+      選択後も「メニューに戻る」から切り替えできます。
+    </div>
+  </main>
+
+  <!-- 入力画面 -->
+  <main class="sheet" id="inputView" style="display:none;">
+    <form id="reserveForm" novalidate>
+
+      <!-- 予約メニュー（ロジック用に残す：画面には出さない） -->
+      <div class="row" style="display:none;">
+        <div class="label">メニュー<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">①ボディ／②フェイシャル からお選びください。</p>
+          <select id="menu" required>
+            <option value="">—</option>
+            <option value="ボディ">① ボディ</option>
+            <option value="フェイシャル">② フェイシャル</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ボディ：目的 -->
+      <div class="row" id="bodyPurposeRow" style="display:none;">
+        <div class="label">目的<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">ボディを選択した方：目的をお選びください。</p>
+          <select id="bodyPurpose">
+            <option value="">—</option>
+            <option value="リラクゼーション">① リラクゼーション</option>
+            <option value="ダイエット">② ダイエット</option>
+            <option value="どちらも">③ どちらも</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ボディ：気になるところ -->
+      <div class="row" id="bodyConcernRow" style="display:none;">
+        <div class="label">気になるところ<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">複数選択できます。</p>
+          <div class="chkGrid">
+            <label class="chk"><input type="checkbox" id="c_shoulder" value="肩こり">肩こり</label>
+            <label class="chk"><input type="checkbox" id="c_headache" value="頭痛">頭痛</label>
+            <label class="chk"><input type="checkbox" id="c_neck" value="首">首</label>
+            <label class="chk"><input type="checkbox" id="c_lowback" value="腰痛">腰痛</label>
+            <label class="chk"><input type="checkbox" id="c_swelling" value="むくみ">むくみ</label>
+            <label class="chk"><input type="checkbox" id="c_belly" value="お腹">お腹</label>
+            <label class="chk"><input type="checkbox" id="c_upperarm" value="二の腕">二の腕</label>
+            <label class="chk"><input type="checkbox" id="c_back" value="背中">背中</label>
+            <label class="chk"><input type="checkbox" id="c_hip" value="おしり">おしり</label>
+            <label class="chk"><input type="checkbox" id="c_thigh" value="太もも">太もも</label>
+            <label class="chk"><input type="checkbox" id="c_calf" value="ふくらはぎ">ふくらはぎ</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ボディ：ダイエット詳細（目的がダイエット or どちらも） -->
+      <div class="row" id="dietDeadlineRow" style="display:none;">
+        <div class="label">いつまでに<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">例：3月末まで／2ヶ月以内 など</p>
+          <input id="dietDeadline" type="text" placeholder="例：3月末まで" />
+        </div>
+      </div>
+
+      <div class="row" id="dietFocusRow" style="display:none;">
+        <div class="label">重視<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">体重 or ボディライン、どちら重視ですか？</p>
+          <select id="dietFocus">
+            <option value="">—</option>
+            <option value="体重重視">体重重視</option>
+            <option value="ボディライン重視">ボディライン重視</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" id="dietGoalRow" style="display:none;">
+        <div class="label">目標<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">例：−3kg／ウエスト−5cm など（自由記入）</p>
+          <input id="dietGoal" type="text" placeholder="例：−3kg" />
+        </div>
+      </div>
+
+      <!-- フェイシャル（仮メニュー） -->
+      <div class="row" id="facialTypeRow" style="display:none;">
+        <div class="label">フェイシャル内容<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">※仮の内容です（後で差し替え可）</p>
+          <select id="facialType">
+            <option value="">—</option>
+            <option value="ベーシック保湿ケア（仮）">① ベーシック保湿ケア（仮）</option>
+            <option value="毛穴すっきりケア（仮）">② 毛穴すっきりケア（仮）</option>
+            <option value="リフトケア（仮）">③ リフトケア（仮）</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 共通：生活面（睡眠） -->
+      <div class="row">
+        <div class="label">睡眠（任意）</div>
+        <div class="control">
+          <p class="hint">就寝／起床時間を入力してください。</p>
+          <div class="subControl">
+            <label class="hint" for="sleepBed">就寝</label>
+            <input id="sleepBed" type="time" />
+          </div>
+          <div class="subControl">
+            <label class="hint" for="sleepWake">起床</label>
+            <input id="sleepWake" type="time" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 共通：生理痛 -->
+      <div class="row">
+        <div class="label">生理痛（任意）</div>
+        <div class="control">
+          <select id="periodPain">
+            <option value="">—</option>
+            <option value="なし">なし</option>
+            <option value="あり">あり</option>
+          </select>
+
+          <div class="subControl" id="periodPainLevelWrap" style="display:none;">
+            <p class="hint">「あり」の場合、程度を選択してください。</p>
+            <select id="periodPainLevel">
+              <option value="">—</option>
+              <option value="軽度">軽度</option>
+              <option value="中度">中度</option>
+              <option value="重度">重度</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 共通：生理周期 -->
+      <div class="row">
+        <div class="label">生理周期（任意）</div>
+        <div class="control">
+          <select id="periodCycle">
+            <option value="">—</option>
+            <option value="予定通り">予定通り</option>
+            <option value="不順">不順</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 共通：食事面 -->
+      <div class="row">
+        <div class="label">食事リズム（任意）</div>
+        <div class="control">
+          <select id="mealRhythm">
+            <option value="">—</option>
+            <option value="規則正しい">規則正しい</option>
+            <option value="不規則">不規則</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">食事（任意）</div>
+        <div class="control">
+          <p class="hint">朝食／昼食／夕食それぞれ選択してください。</p>
+
+          <div class="subControl">
+            <label class="hint" for="breakfast">朝食</label>
+            <select id="breakfast">
+              <option value="">—</option>
+              <option value="摂れている">摂れている</option>
+              <option value="摂れていない">摂れていない</option>
+            </select>
+          </div>
+
+          <div class="subControl">
+            <label class="hint" for="lunch">昼食</label>
+            <select id="lunch">
+              <option value="">—</option>
+              <option value="摂れている">摂れている</option>
+              <option value="摂れていない">摂れていない</option>
+            </select>
+          </div>
+
+          <div class="subControl">
+            <label class="hint" for="dinner">夕食</label>
+            <select id="dinner">
+              <option value="">—</option>
+              <option value="摂れている">摂れている</option>
+              <option value="摂れていない">摂れていない</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">間食（任意）</div>
+        <div class="control">
+          <select id="snack">
+            <option value="">—</option>
+            <option value="あり">あり</option>
+            <option value="なし">なし</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">好きな食べ物（任意）</div>
+        <div class="control">
+          <input id="favoriteFood" type="text" placeholder="例：甘いもの、和食、辛いもの など" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">外食頻度（任意）</div>
+        <div class="control">
+          <select id="eatingOut">
+            <option value="">—</option>
+            <option value="週1">週1</option>
+            <option value="月2">月2</option>
+            <option value="月1">月1</option>
+            <option value="たまに">たまに</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">お酒（任意）</div>
+        <div class="control">
+          <p class="hint">頻度と、1日どれくらいかを入力してください。</p>
+          <select id="alcoholFreq">
+            <option value="">—</option>
+            <option value="毎日">毎日</option>
+            <option value="週1">週1</option>
+            <option value="月2">月2</option>
+            <option value="たまに">たまに</option>
+          </select>
+          <div class="subControl">
+            <input id="alcoholAmount" type="text" placeholder="例：ビール1本／ワイン2杯 など" />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">カフェイン（任意）</div>
+        <div class="control">
+          <p class="hint">「なし」または1日の杯数を入力してください。</p>
+          <select id="caffeineType">
+            <option value="">—</option>
+            <option value="なし">なし</option>
+            <option value="杯数を入力">杯数を入力</option>
+          </select>
+
+          <div class="subControl" id="caffeineCupsWrap" style="display:none;">
+            <input id="caffeineCups" type="number" inputmode="numeric" min="0" step="1" placeholder="例：2" />
+          </div>
+        </div>
+      </div>
+
+      <div class="actionsRow">
+        <div class="twoBtns">
+          <button class="pillConfirm" type="button" id="toStart">メニューに戻る</button>
+          <button class="pillConfirm" type="button" id="toConfirm">確認</button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <!-- 確認画面 -->
+  <main class="sheet confirm" id="confirmView" aria-live="polite">
+    <div style="padding:14px;">
+      <h2>入力内容の確認</h2>
+      <div class="summary" id="summary"></div>
+
+      <div class="confirmActions">
+        <button class="ghost" type="button" id="backBtn">戻る</button>
+        <button class="send" type="button" id="sendBtn">送信</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- LIFF -->
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+
+  <script>
+    // ★必要に応じて差し替えてください
+    const LIFF_ID = "YOUR_LIFF_ID_HERE";
+
+    const el = (id) => document.getElementById(id);
+
+    const startView = el("startView");
+    const inputView = el("inputView");
+    const confirmView = el("confirmView");
+    const summaryEl = el("summary");
+
+    // start actions
+    const startBody = el("startBody");
+    const startFacial = el("startFacial");
+
+    // core
+    const menu = el("menu");
+
+    // body
+    const bodyPurposeRow = el("bodyPurposeRow");
+    const bodyPurpose = el("bodyPurpose");
+    const bodyConcernRow = el("bodyConcernRow");
+
+    const concernCheckboxes = [
+      el("c_shoulder"), el("c_headache"), el("c_neck"), el("c_lowback"), el("c_swelling"),
+      el("c_belly"), el("c_upperarm"), el("c_back"), el("c_hip"), el("c_thigh"), el("c_calf"),
+    ];
+
+    const dietDeadlineRow = el("dietDeadlineRow");
+    const dietDeadline = el("dietDeadline");
+    const dietFocusRow = el("dietFocusRow");
+    const dietFocus = el("dietFocus");
+    const dietGoalRow = el("dietGoalRow");
+    const dietGoal = el("dietGoal");
+
+    // facial
+    const facialTypeRow = el("facialTypeRow");
+    const facialType = el("facialType");
+
+    // common
+    const sleepBed = el("sleepBed");
+    const sleepWake = el("sleepWake");
+
+    const periodPain = el("periodPain");
+    const periodPainLevelWrap = el("periodPainLevelWrap");
+    const periodPainLevel = el("periodPainLevel");
+    const periodCycle = el("periodCycle");
+
+    const mealRhythm = el("mealRhythm");
+    const breakfast = el("breakfast");
+    const lunch = el("lunch");
+    const dinner = el("dinner");
+    const snack = el("snack");
+    const favoriteFood = el("favoriteFood");
+    const eatingOut = el("eatingOut");
+
+    const alcoholFreq = el("alcoholFreq");
+    const alcoholAmount = el("alcoholAmount");
+
+    const caffeineType = el("caffeineType");
+    const caffeineCupsWrap = el("caffeineCupsWrap");
+    const caffeineCups = el("caffeineCups");
+
+    // actions
+    const toStart = el("toStart");
+    const toConfirm = el("toConfirm");
+    const backBtn = el("backBtn");
+    const sendBtn = el("sendBtn");
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      try { await liff.init({ liffId: LIFF_ID }); }
+      catch (e) { console.warn("LIFF init failed (ブラウザ確認中はOK):", e); }
+
+      // 最初は二択ページ
+      showView(startView);
+      syncConditionalUI();
+    });
+
+    // ---- view helpers ----
+    function showView(target){
+      [startView, inputView, confirmView].forEach(v => {
+        v.style.display = (v === target) ? "block" : "none";
+        v.classList.remove("viewFade");
+      });
+      target.classList.add("viewFade");
+      window.scrollTo({ top:0, behavior:"smooth" });
+    }
+
+    function goToSheet(selectedMenu){
+      menu.value = selectedMenu;   // "ボディ" or "フェイシャル"
+      syncConditionalUI();
+      showView(inputView);
+    }
+
+    startBody.addEventListener("click", () => goToSheet("ボディ"));
+    startFacial.addEventListener("click", () => goToSheet("フェイシャル"));
+
+    toStart.addEventListener("click", () => {
+      showView(startView);
+    });
+
+    // ---- conditional UI ----
+    function clearBodyFields(){
+      bodyPurpose.value = "";
+      concernCheckboxes.forEach(chk => chk.checked = false);
+      dietDeadline.value = "";
+      dietFocus.value = "";
+      dietGoal.value = "";
+    }
+    function clearFacialFields(){
+      facialType.value = "";
+    }
+
+    function syncConditionalUI(){
+      const m = menu.value;
+
+      // menu switch
+      const isBody = m === "ボディ";
+      const isFacial = m === "フェイシャル";
+
+      bodyPurposeRow.style.display = isBody ? "block" : "none";
+      bodyConcernRow.style.display = isBody ? "block" : "none";
+
+      facialTypeRow.style.display = isFacial ? "block" : "none";
+
+      if(!isBody) clearBodyFields();
+      if(!isFacial) clearFacialFields();
+
+      // diet extra
+      const purpose = bodyPurpose.value;
+      const showDiet = isBody && (purpose === "ダイエット" || purpose === "どちらも");
+      dietDeadlineRow.style.display = showDiet ? "block" : "none";
+      dietFocusRow.style.display = showDiet ? "block" : "none";
+      dietGoalRow.style.display = showDiet ? "block" : "none";
+      if(!showDiet){
+        dietDeadline.value = "";
+        dietFocus.value = "";
+        dietGoal.value = "";
+      }
+
+      // period pain level
+      const pp = periodPain.value;
+      periodPainLevelWrap.style.display = (pp === "あり") ? "block" : "none";
+      if(pp !== "あり") periodPainLevel.value = "";
+
+      // caffeine cups
+      caffeineCupsWrap.style.display = (caffeineType.value === "杯数を入力") ? "block" : "none";
+      if(caffeineType.value !== "杯数を入力") caffeineCups.value = "";
+    }
+
+    // menuは隠れているが、ロジック用にchangeも残す
+    menu.addEventListener("change", syncConditionalUI);
+    bodyPurpose.addEventListener("change", syncConditionalUI);
+    periodPain.addEventListener("change", syncConditionalUI);
+    caffeineType.addEventListener("change", syncConditionalUI);
+
+    // ---- data ----
+    function getFormData(){
+      const m = menu.value;
+
+      const concerns = concernCheckboxes
+        .filter(chk => chk.checked)
+        .map(chk => chk.value);
+
+      const d = {
+        menu: m,
+
+        bodyPurpose: bodyPurpose.value,
+        concerns,
+
+        dietDeadline: dietDeadline.value.trim(),
+        dietFocus: dietFocus.value,
+        dietGoal: dietGoal.value.trim(),
+
+        facialType: facialType.value,
+
+        sleepBed: sleepBed.value,
+        sleepWake: sleepWake.value,
+
+        periodPain: periodPain.value,
+        periodPainLevel: periodPainLevel.value,
+        periodCycle: periodCycle.value,
+
+        mealRhythm: mealRhythm.value,
+        breakfast: breakfast.value,
+        lunch: lunch.value,
+        dinner: dinner.value,
+        snack: snack.value,
+
+        favoriteFood: favoriteFood.value.trim(),
+        eatingOut: eatingOut.value,
+
+        alcoholFreq: alcoholFreq.value,
+        alcoholAmount: alcoholAmount.value.trim(),
+
+        caffeineType: caffeineType.value,
+        caffeineCups: caffeineCups.value
+      };
+
+      // display texts
+      d.concernsText = concerns.length ? concerns.join("、") : "未選択";
+      d.periodPainText = d.periodPain === "あり"
+        ? (d.periodPainLevel ? `あり（${d.periodPainLevel}）` : "あり（程度未選択）")
+        : (d.periodPain ? d.periodPain : "—");
+
+      if(d.caffeineType === "なし") d.caffeineText = "なし";
+      else if(d.caffeineType === "杯数を入力") d.caffeineText = (d.caffeineCups !== "" ? `${d.caffeineCups}杯` : "杯数未入力");
+      else d.caffeineText = "—";
+
+      d.sleepText = (d.sleepBed || d.sleepWake)
+        ? `就寝：${d.sleepBed || "—"} / 起床：${d.sleepWake || "—"}`
+        : "—";
+
+      d.mealsText = [
+        `朝食：${d.breakfast || "—"}`,
+        `昼食：${d.lunch || "—"}`,
+        `夕食：${d.dinner || "—"}`
+      ].join(" / ");
+
+      d.alcoholText = (d.alcoholFreq || d.alcoholAmount)
+        ? `${d.alcoholFreq || "—"} / 量：${d.alcoholAmount || "—"}`
+        : "—";
+
+      return d;
+    }
+
+    function validate(){
+      const d = getFormData();
+
+      if(!d.menu){
+        alert("メニューを選択してください。");
+        showView(startView);
+        return null;
+      }
+
+      if(d.menu === "ボディ"){
+        if(!d.bodyPurpose){
+          alert("目的（ボディ）を選択してください。");
+          bodyPurpose.focus();
+          return null;
+        }
+        if(!d.concerns.length){
+          alert("気になるところ（ボディ）を1つ以上選択してください。");
+          return null;
+        }
+        const showDiet = (d.bodyPurpose === "ダイエット" || d.bodyPurpose === "どちらも");
+        if(showDiet){
+          if(!d.dietDeadline){
+            alert("「いつまでに」を入力してください。");
+            dietDeadline.focus();
+            return null;
+          }
+          if(!d.dietFocus){
+            alert("「重視」を選択してください。");
+            dietFocus.focus();
+            return null;
+          }
+          if(!d.dietGoal){
+            alert("「目標」を入力してください。");
+            dietGoal.focus();
+            return null;
+          }
+        }
+      }
+
+      if(d.menu === "フェイシャル"){
+        if(!d.facialType){
+          alert("フェイシャル内容（仮）を選択してください。");
+          facialType.focus();
+          return null;
+        }
+      }
+
+      // optional fields do not need validation except: period pain level when "あり"
+      if(d.periodPain === "あり" && !d.periodPainLevel){
+        alert("生理痛が「あり」の場合、程度を選択してください。");
+        periodPainLevel.focus();
+        return null;
+      }
+
+      // caffeine cups when "杯数を入力"
+      if(d.caffeineType === "杯数を入力" && d.caffeineCups === ""){
+        alert("カフェインの杯数を入力してください。");
+        caffeineCups.focus();
+        return null;
+      }
+
+      return d;
+    }
+
+    // ---- confirm step ----
+    toConfirm.addEventListener("click", () => {
+      const d = validate();
+      if(!d) return;
+
+      const rows = [];
+
+      rows.push(["メニュー", d.menu]);
+
+      if(d.menu === "ボディ"){
+        rows.push(["目的", d.bodyPurpose]);
+        rows.push(["気になるところ", d.concernsText]);
+
+        const showDiet = (d.bodyPurpose === "ダイエット" || d.bodyPurpose === "どちらも");
+        if(showDiet){
+          rows.push(["いつまでに", d.dietDeadline]);
+          rows.push(["重視", d.dietFocus]);
+          rows.push(["目標", d.dietGoal]);
+        }
+      }
+
+      if(d.menu === "フェイシャル"){
+        rows.push(["フェイシャル内容（仮）", d.facialType]);
+      }
+
+      rows.push(["睡眠", d.sleepText]);
+      rows.push(["生理痛", d.periodPainText]);
+      rows.push(["生理周期", d.periodCycle || "—"]);
+      rows.push(["食事リズム", d.mealRhythm || "—"]);
+      rows.push(["食事", d.mealsText]);
+      rows.push(["間食", d.snack || "—"]);
+      rows.push(["好きな食べ物", d.favoriteFood || "—"]);
+      rows.push(["外食の頻度", d.eatingOut || "—"]);
+      rows.push(["お酒", d.alcoholText]);
+      rows.push(["カフェイン", d.caffeineText]);
+
+      summaryEl.innerHTML = rows.map(([k,v]) => `
+        <div class="sumRow">
+          <div class="sumKey">${escapeHtml(k)}</div>
+          <div class="sumVal">${escapeHtml(v)}</div>
+        </div>
+      `).join("");
+
+      showView(confirmView);
+    });
+
+    backBtn.addEventListener("click", () => {
+      showView(inputView);
+    });
+
+    // ---- send ----
+    sendBtn.addEventListener("click", async () => {
+      const d = validate();
+      if(!d) return;
+
+      const lines = [];
+      lines.push("≪ご予約フォーム≫");
+      lines.push(`【メニュー】${d.menu}`);
+
+      if(d.menu === "ボディ"){
+        lines.push(`【目的】${d.bodyPurpose}`);
+        lines.push(`【気になるところ】${d.concernsText}`);
+        const showDiet = (d.bodyPurpose === "ダイエット" || d.bodyPurpose === "どちらも");
+        if(showDiet){
+          lines.push(`【いつまでに】${d.dietDeadline}`);
+          lines.push(`【重視】${d.dietFocus}`);
+          lines.push(`【目標】${d.dietGoal}`);
+        }
+      }
+
+      if(d.menu === "フェイシャル"){
+        lines.push(`【フェイシャル内容（仮）】${d.facialType}`);
+      }
+
+      lines.push(`【睡眠】${d.sleepText}`);
+      lines.push(`【生理痛】${d.periodPainText}`);
+      lines.push(`【生理周期】${d.periodCycle || "—"}`);
+      lines.push(`【食事リズム】${d.mealRhythm || "—"}`);
+      lines.push(`【食事】${d.mealsText}`);
+      lines.push(`【間食】${d.snack || "—"}`);
+      lines.push(`【好きな食べ物】${d.favoriteFood || "—"}`);
+      lines.push(`【外食の頻度】${d.eatingOut || "—"}`);
+      lines.push(`【お酒】${d.alcoholText}`);
+      lines.push(`【カフェイン】${d.caffeineText}`);
+
+      const text = lines.join("\n");
+
+      try{
+        if(window.liff && liff.isInClient && liff.isInClient()){
+          await liff.sendMessages([{ type:"text", text }]);
+          alert("ご記入ありがとうございます。");
+          liff.closeWindow();
+        }else{
+          alert("（ブラウザ確認）送信テキストをコンソールに出力しました。");
+          console.log(text);
+        }
+      }catch(e){
+        console.error(e);
+        alert("送信に失敗しました。もう一度お試しください。");
+      }
+    });
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
+</body>
+</html>
