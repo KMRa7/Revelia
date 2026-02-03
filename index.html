@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ご予約フォーム</title>
+  <title>カウンセリングシート</title>
 
   <style>
     :root{
@@ -321,12 +321,11 @@
       max-width:100%;
       overflow-x:hidden;   /* 横スクロールを抑止 */
     }
-    
   </style>
 </head>
 
 <body>
-  <div class="titlebar">ご予約フォーム</div>
+  <div class="titlebar">カウンセリングシート</div>
 
   <!-- 最初の二択ページ -->
   <main class="sheet" id="startView" style="display:none;">
@@ -443,23 +442,22 @@
         </div>
       </div>
 
-      <!-- フェイシャル（仮メニュー） -->
+      <!-- フェイシャル（選択肢変更） -->
       <div class="row" id="facialTypeRow" style="display:none;">
         <div class="label">フェイシャル内容<span class="req">*</span></div>
         <div class="control">
-          <p class="hint">※仮の内容です（後で差し替え可）</p>
+          <p class="hint">内容をお選びください。</p>
           <select id="facialType">
             <option value="">—</option>
-            <option value="ベーシック保湿ケア（仮）">① ベーシック保湿ケア（仮）</option>
-            <option value="毛穴すっきりケア（仮）">② 毛穴すっきりケア（仮）</option>
-            <option value="リフトケア（仮）">③ リフトケア（仮）</option>
+            <option value="結果重視">結果重視</option>
+            <option value="リラクゼーション">リラクゼーション</option>
           </select>
         </div>
       </div>
 
       <!-- 共通：生活面（睡眠） -->
       <div class="row">
-        <div class="label">睡眠（任意）</div>
+        <div class="label">睡眠</div>
         <div class="control">
           <p class="hint">就寝／起床時間を入力してください。</p>
           <div class="subControl">
@@ -475,7 +473,7 @@
 
       <!-- 共通：生理痛 -->
       <div class="row">
-        <div class="label">生理痛（任意）</div>
+        <div class="label">生理痛</div>
         <div class="control">
           <select id="periodPain">
             <option value="">—</option>
@@ -497,7 +495,7 @@
 
       <!-- 共通：生理周期 -->
       <div class="row">
-        <div class="label">生理周期（任意）</div>
+        <div class="label">生理周期</div>
         <div class="control">
           <select id="periodCycle">
             <option value="">—</option>
@@ -509,7 +507,7 @@
 
       <!-- 共通：食事面 -->
       <div class="row">
-        <div class="label">食事リズム（任意）</div>
+        <div class="label">食事リズム</div>
         <div class="control">
           <select id="mealRhythm">
             <option value="">—</option>
@@ -520,7 +518,7 @@
       </div>
 
       <div class="row">
-        <div class="label">食事（任意）</div>
+        <div class="label">食事</div>
         <div class="control">
           <p class="hint">朝食／昼食／夕食それぞれ選択してください。</p>
 
@@ -554,7 +552,7 @@
       </div>
 
       <div class="row">
-        <div class="label">間食（任意）</div>
+        <div class="label">間食</div>
         <div class="control">
           <select id="snack">
             <option value="">—</option>
@@ -565,14 +563,14 @@
       </div>
 
       <div class="row">
-        <div class="label">好きな食べ物（任意）</div>
+        <div class="label">好きな食べ物</div>
         <div class="control">
           <input id="favoriteFood" type="text" placeholder="例：甘いもの、和食、辛いもの など" />
         </div>
       </div>
 
       <div class="row">
-        <div class="label">外食頻度（任意）</div>
+        <div class="label">外食頻度</div>
         <div class="control">
           <select id="eatingOut">
             <option value="">—</option>
@@ -585,7 +583,7 @@
       </div>
 
       <div class="row">
-        <div class="label">お酒（任意）</div>
+        <div class="label">お酒</div>
         <div class="control">
           <p class="hint">頻度と、1日どれくらいかを入力してください。</p>
           <select id="alcoholFreq">
@@ -601,8 +599,32 @@
         </div>
       </div>
 
+      <!-- ★追加：タバコ -->
       <div class="row">
-        <div class="label">カフェイン（任意）</div>
+        <div class="label">タバコ</div>
+        <div class="control">
+          <p class="hint">タバコは吸われますか？</p>
+          <select id="smoking">
+            <option value="">—</option>
+            <option value="吸う">吸う</option>
+            <option value="吸わない">吸わない</option>
+          </select>
+
+          <div class="subControl" id="smokingAmountWrap" style="display:none;">
+            <p class="hint">「吸う」の場合、本数を選択してください。</p>
+            <select id="smokingAmount">
+              <option value="">—</option>
+              <option value="1日15~20本">1日15~20本</option>
+              <option value="1日10~15本">1日10~15本</option>
+              <option value="1日1~10本">1日1~10本</option>
+              <option value="たまに吸う">たまに吸う</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">カフェイン</div>
         <div class="control">
           <p class="hint">「なし」または1日の杯数を入力してください。</p>
           <select id="caffeineType">
@@ -701,6 +723,11 @@
     const alcoholFreq = el("alcoholFreq");
     const alcoholAmount = el("alcoholAmount");
 
+    // ★smoking
+    const smoking = el("smoking");
+    const smokingAmountWrap = el("smokingAmountWrap");
+    const smokingAmount = el("smokingAmount");
+
     const caffeineType = el("caffeineType");
     const caffeineCupsWrap = el("caffeineCupsWrap");
     const caffeineCups = el("caffeineCups");
@@ -790,6 +817,10 @@
       // caffeine cups
       caffeineCupsWrap.style.display = (caffeineType.value === "杯数を入力") ? "block" : "none";
       if(caffeineType.value !== "杯数を入力") caffeineCups.value = "";
+
+      // ★smoking amount
+      smokingAmountWrap.style.display = (smoking.value === "吸う") ? "block" : "none";
+      if(smoking.value !== "吸う") smokingAmount.value = "";
     }
 
     // menuは隠れているが、ロジック用にchangeも残す
@@ -797,6 +828,7 @@
     bodyPurpose.addEventListener("change", syncConditionalUI);
     periodPain.addEventListener("change", syncConditionalUI);
     caffeineType.addEventListener("change", syncConditionalUI);
+    smoking.addEventListener("change", syncConditionalUI);
 
     // ---- data ----
     function getFormData(){
@@ -837,6 +869,10 @@
         alcoholFreq: alcoholFreq.value,
         alcoholAmount: alcoholAmount.value.trim(),
 
+        // ★smoking
+        smoking: smoking.value,
+        smokingAmount: smokingAmount.value,
+
         caffeineType: caffeineType.value,
         caffeineCups: caffeineCups.value
       };
@@ -864,6 +900,15 @@
       d.alcoholText = (d.alcoholFreq || d.alcoholAmount)
         ? `${d.alcoholFreq || "—"} / 量：${d.alcoholAmount || "—"}`
         : "—";
+
+      // ★smoking text
+      if(d.smoking === "吸う"){
+        d.smokingText = d.smokingAmount ? `吸う（${d.smokingAmount}）` : "吸う（本数未選択）";
+      }else if(d.smoking === "吸わない"){
+        d.smokingText = "吸わない";
+      }else{
+        d.smokingText = "—";
+      }
 
       return d;
     }
@@ -909,7 +954,7 @@
 
       if(d.menu === "フェイシャル"){
         if(!d.facialType){
-          alert("フェイシャル内容（仮）を選択してください。");
+          alert("フェイシャル内容を選択してください。");
           facialType.focus();
           return null;
         }
@@ -926,6 +971,13 @@
       if(d.caffeineType === "杯数を入力" && d.caffeineCups === ""){
         alert("カフェインの杯数を入力してください。");
         caffeineCups.focus();
+        return null;
+      }
+
+      // ★smoking amount when "吸う"
+      if(d.smoking === "吸う" && !d.smokingAmount){
+        alert("タバコが「吸う」の場合、本数を選択してください。");
+        smokingAmount.focus();
         return null;
       }
 
@@ -954,7 +1006,7 @@
       }
 
       if(d.menu === "フェイシャル"){
-        rows.push(["フェイシャル内容（仮）", d.facialType]);
+        rows.push(["フェイシャル内容", d.facialType]);
       }
 
       rows.push(["睡眠", d.sleepText]);
@@ -966,6 +1018,7 @@
       rows.push(["好きな食べ物", d.favoriteFood || "—"]);
       rows.push(["外食の頻度", d.eatingOut || "—"]);
       rows.push(["お酒", d.alcoholText]);
+      rows.push(["タバコ", d.smokingText]);
       rows.push(["カフェイン", d.caffeineText]);
 
       summaryEl.innerHTML = rows.map(([k,v]) => `
@@ -988,7 +1041,7 @@
       if(!d) return;
 
       const lines = [];
-      lines.push("≪ご予約フォーム≫");
+      lines.push("≪カウンセリングシート≫");
       lines.push(`【メニュー】${d.menu}`);
 
       if(d.menu === "ボディ"){
@@ -1003,7 +1056,7 @@
       }
 
       if(d.menu === "フェイシャル"){
-        lines.push(`【フェイシャル内容（仮）】${d.facialType}`);
+        lines.push(`【フェイシャル内容】${d.facialType}`);
       }
 
       lines.push(`【睡眠】${d.sleepText}`);
@@ -1015,6 +1068,7 @@
       lines.push(`【好きな食べ物】${d.favoriteFood || "—"}`);
       lines.push(`【外食の頻度】${d.eatingOut || "—"}`);
       lines.push(`【お酒】${d.alcoholText}`);
+      lines.push(`【タバコ】${d.smokingText}`);
       lines.push(`【カフェイン】${d.caffeineText}`);
 
       const text = lines.join("\n");
