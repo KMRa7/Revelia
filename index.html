@@ -378,6 +378,15 @@
         </div>
       </div>
 
+      <!-- ★追加：名前（必須） -->
+      <div class="row">
+        <div class="label">お名前<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">フルネームで入力してください。</p>
+          <input id="name" type="text" autocomplete="name" placeholder="例：山田 太郎" />
+        </div>
+      </div>
+
       <!-- ★追加：電話番号（必須） -->
       <div class="row">
         <div class="label">電話番号<span class="req">*</span></div>
@@ -711,6 +720,7 @@
     const menu = el("menu");
 
     // ★追加：共通必須
+    const nameEl = el("name");
     const phone = el("phone");
     const address = el("address");
     const birthday = el("birthday");
@@ -874,7 +884,8 @@
       const d = {
         menu: m,
 
-        // ★追加：共通必須
+        // ★共通必須
+        name: nameEl.value.trim(),
         phone: phone.value.trim(),
         address: address.value.trim(),
         birthday: birthday.value, // YYYY-MM-DD
@@ -935,7 +946,7 @@
         `夕食：${d.dinner || "—"}`
       ].join(" / ");
 
-      // ★お酒：飲まないなら量は不要扱い（表示も整える）
+      // お酒：飲まないなら量は不要扱い
       if(d.alcoholFreq === "飲まない"){
         d.alcoholText = "飲まない";
       }else{
@@ -944,7 +955,7 @@
           : "—";
       }
 
-      // ★smoking text
+      // smoking text
       if(d.smoking === "吸う"){
         d.smokingText = d.smokingAmount ? `吸う（${d.smokingAmount}）` : "吸う（本数未選択）";
       }else if(d.smoking === "吸わない"){
@@ -965,7 +976,12 @@
         return null;
       }
 
-      // ★追加：共通必須
+      // ★共通必須
+      if(!d.name){
+        alert("お名前を入力してください。");
+        nameEl.focus();
+        return null;
+      }
       if(!d.phone){
         alert("電話番号を入力してください。");
         phone.focus();
@@ -1020,7 +1036,7 @@
         }
       }
 
-      // optional fields do not need validation except: period pain level when "あり"
+      // period pain level when "あり"
       if(d.periodPain === "あり" && !d.periodPainLevel){
         alert("生理痛が「あり」の場合、程度を選択してください。");
         periodPainLevel.focus();
@@ -1034,15 +1050,12 @@
         return null;
       }
 
-      // ★smoking amount when "吸う"
+      // smoking amount when "吸う"
       if(d.smoking === "吸う" && !d.smokingAmount){
         alert("タバコが「吸う」の場合、本数を選択してください。");
         smokingAmount.focus();
         return null;
       }
-
-      // ★お酒：飲まない以外で、頻度を選んでるのに量が空でもOK（現状のまま）
-      // もし「飲まない以外は量必須」にしたい場合はここにチェックを追加します
 
       return d;
     }
@@ -1056,7 +1069,8 @@
 
       rows.push(["メニュー", d.menu]);
 
-      // ★追加：共通必須
+      // ★共通必須
+      rows.push(["お名前", d.name]);
       rows.push(["電話番号", d.phone]);
       rows.push(["住所", d.address]);
       rows.push(["生年月日", d.birthday]);
@@ -1112,7 +1126,8 @@
       lines.push("≪カウンセリングシート≫");
       lines.push(`【メニュー】${d.menu}`);
 
-      // ★追加：共通必須
+      // ★共通必須
+      lines.push(`【お名前】${d.name}`);
       lines.push(`【電話番号】${d.phone}`);
       lines.push(`【住所】${d.address}`);
       lines.push(`【生年月日】${d.birthday}`);
