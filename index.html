@@ -378,6 +378,33 @@
         </div>
       </div>
 
+      <!-- ★追加：電話番号（必須） -->
+      <div class="row">
+        <div class="label">電話番号<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">例：09012345678（ハイフンなし推奨）</p>
+          <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="例：09012345678" />
+        </div>
+      </div>
+
+      <!-- ★追加：住所（必須） -->
+      <div class="row">
+        <div class="label">住所<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">都道府県から入力してください。</p>
+          <input id="address" type="text" autocomplete="street-address" placeholder="例：東京都◯◯区◯◯ 1-2-3" />
+        </div>
+      </div>
+
+      <!-- ★追加：生年月日（必須） -->
+      <div class="row">
+        <div class="label">生年月日<span class="req">*</span></div>
+        <div class="control">
+          <p class="hint">カレンダーから選択してください。</p>
+          <input id="birthday" type="date" />
+        </div>
+      </div>
+
       <!-- ボディ：目的 -->
       <div class="row" id="bodyPurposeRow" style="display:none;">
         <div class="label">目的<span class="req">*</span></div>
@@ -588,6 +615,7 @@
           <p class="hint">頻度と、1日どれくらいかを入力してください。</p>
           <select id="alcoholFreq">
             <option value="">—</option>
+            <option value="飲まない">飲まない</option>
             <option value="毎日">毎日</option>
             <option value="週1">週1</option>
             <option value="月2">月2</option>
@@ -681,6 +709,11 @@
 
     // core
     const menu = el("menu");
+
+    // ★追加：共通必須
+    const phone = el("phone");
+    const address = el("address");
+    const birthday = el("birthday");
 
     // body
     const bodyPurposeRow = el("bodyPurposeRow");
@@ -841,6 +874,11 @@
       const d = {
         menu: m,
 
+        // ★追加：共通必須
+        phone: phone.value.trim(),
+        address: address.value.trim(),
+        birthday: birthday.value, // YYYY-MM-DD
+
         bodyPurpose: bodyPurpose.value,
         concerns,
 
@@ -897,9 +935,14 @@
         `夕食：${d.dinner || "—"}`
       ].join(" / ");
 
-      d.alcoholText = (d.alcoholFreq || d.alcoholAmount)
-        ? `${d.alcoholFreq || "—"} / 量：${d.alcoholAmount || "—"}`
-        : "—";
+      // ★お酒：飲まないなら量は不要扱い（表示も整える）
+      if(d.alcoholFreq === "飲まない"){
+        d.alcoholText = "飲まない";
+      }else{
+        d.alcoholText = (d.alcoholFreq || d.alcoholAmount)
+          ? `${d.alcoholFreq || "—"} / 量：${d.alcoholAmount || "—"}`
+          : "—";
+      }
 
       // ★smoking text
       if(d.smoking === "吸う"){
@@ -919,6 +962,23 @@
       if(!d.menu){
         alert("メニューを選択してください。");
         showView(startView);
+        return null;
+      }
+
+      // ★追加：共通必須
+      if(!d.phone){
+        alert("電話番号を入力してください。");
+        phone.focus();
+        return null;
+      }
+      if(!d.address){
+        alert("住所を入力してください。");
+        address.focus();
+        return null;
+      }
+      if(!d.birthday){
+        alert("生年月日を選択してください。");
+        birthday.focus();
         return null;
       }
 
@@ -981,6 +1041,9 @@
         return null;
       }
 
+      // ★お酒：飲まない以外で、頻度を選んでるのに量が空でもOK（現状のまま）
+      // もし「飲まない以外は量必須」にしたい場合はここにチェックを追加します
+
       return d;
     }
 
@@ -992,6 +1055,11 @@
       const rows = [];
 
       rows.push(["メニュー", d.menu]);
+
+      // ★追加：共通必須
+      rows.push(["電話番号", d.phone]);
+      rows.push(["住所", d.address]);
+      rows.push(["生年月日", d.birthday]);
 
       if(d.menu === "ボディ"){
         rows.push(["目的", d.bodyPurpose]);
@@ -1043,6 +1111,11 @@
       const lines = [];
       lines.push("≪カウンセリングシート≫");
       lines.push(`【メニュー】${d.menu}`);
+
+      // ★追加：共通必須
+      lines.push(`【電話番号】${d.phone}`);
+      lines.push(`【住所】${d.address}`);
+      lines.push(`【生年月日】${d.birthday}`);
 
       if(d.menu === "ボディ"){
         lines.push(`【目的】${d.bodyPurpose}`);
